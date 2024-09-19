@@ -21,16 +21,49 @@ import { useAppSelector } from "../hooks/useAppSelector"
 import TaskLabel from "./TaskLabel"
 import PriorityLabel from "./PriorityLabel"
 import { useAppDispatch } from "../hooks/useAppDispatch"
-import { deleteTask } from "../features/tasks/tasksSlice"
+import {
+    deleteTask,
+    toggleTaskStatus,
+    updatePriorityLevel
+} from "../features/tasks/tasksSlice"
 import DrawerToogleBtn from "../features/drawer/DrawerToogleBtn"
 
 const TaskList = () => {
     const taskList = useAppSelector((state) => state.tasksReducer.tasks)
     const dispatch = useAppDispatch()
 
+    // fuction to handle priority level update
+    const handleTasksPriorityLevelChange = (
+        key: string | undefined,
+        priority: "low" | "medium" | "high"
+    ) => {
+        const updatedTasksList: Task[] = taskList.map((task) =>
+            task.key === key ? { ...task, priority: priority } : task
+        )
+        dispatch(updatePriorityLevel(updatedTasksList))
+        message.success("Task's priority changed!")
+    }
+
+    // fuction to handle status update
+    const handleTaskStatusChange = (
+        key: string | undefined,
+        checked: boolean
+    ) => {
+        const updatedTasksList: Task[] = taskList.map((task) =>
+            task.key === key
+                ? { ...task, status: checked ? "completed" : "pending" }
+                : task
+        )
+        dispatch(toggleTaskStatus(updatedTasksList))
+        message.success("Task status changed!")
+    }
+
     // function for handle delete a task
     const handleDeleteTask = (key: string | undefined) => {
-        dispatch(deleteTask(key))
+        const updatedTaskList: Task[] = taskList.filter(
+            (item) => item.key !== key
+        )
+        dispatch(deleteTask(updatedTaskList))
         message.success("Task Deleted Successfully!")
     }
 
@@ -71,9 +104,9 @@ const TaskList = () => {
                 render={(record: Task) => (
                     <Checkbox
                         checked={record.status === "completed"}
-                        // onChange={(e) =>
-                        //     handleTaskStatusChange(record.key, e.target.checked)
-                        // }
+                        onChange={(e) =>
+                            handleTaskStatusChange(record.key, e.target.checked)
+                        }
                     />
                 )}
             />
@@ -102,9 +135,9 @@ const TaskList = () => {
                 render={(priority: "low" | "medium" | "high", record: Task) => (
                     <Select
                         defaultValue={priority}
-                        // onChange={(priority) =>
-                        //     handleTasksPriorityLevelChange(record.key, priority)
-                        // }
+                        onChange={(priority) =>
+                            handleTasksPriorityLevelChange(record.key, priority)
+                        }
                         style={{
                             width: "100%",
                             maxWidth: 140
