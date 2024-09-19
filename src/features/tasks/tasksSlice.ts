@@ -21,15 +21,21 @@ const taskSlice = createSlice({
             state.tasks.push(action.payload)
             saveTaskToLocalStorage(state.tasks)
         },
-        deleteTask: (state, action: PayloadAction<string | undefined>) => {
-            const updatedTaskList = state.tasks.filter(
-                (item) => item.key !== action.payload
-            )
-            state.tasks = updatedTaskList
-            saveTaskToLocalStorage(updatedTaskList)
+        deleteTask: (state, action: PayloadAction<Task[]>) => {
+            state.tasks = action.payload
+            saveTaskToLocalStorage(action.payload)
+        },
+        toggleTaskStatus: (state, action: PayloadAction<Task[]>) => {
+            state.tasks = action.payload
+            saveTaskToLocalStorage(state.tasks)
+        },
+        updatePriorityLevel: (state, action: PayloadAction<Task[]>) => {
+            state.tasks = action.payload
+            saveTaskToLocalStorage(state.tasks)
         }
     }
 })
 
-export const { addTask, deleteTask } = taskSlice.actions
+export const { addTask, deleteTask, toggleTaskStatus, updatePriorityLevel } =
+    taskSlice.actions
 export default taskSlice.reducer
